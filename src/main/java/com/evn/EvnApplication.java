@@ -9,5 +9,5 @@ public class EvnApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EvnApplication.class, args);
 	}
-
+	
 }
