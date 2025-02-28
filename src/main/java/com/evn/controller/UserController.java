@@ -4,7 +4,6 @@ import com.evn.model.User;
 import com.evn.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -17,5 +16,10 @@ public class UserController {
     @GetMapping
     public List<User> getUsers() {
         return userService.getAllUsers();
+    }
+
+    @PostMapping
+    public User addUser(@RequestBody User user) throws Exception {
+        return userService.addUser(user);
     }
 }

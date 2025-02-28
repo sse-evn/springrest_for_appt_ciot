@@ -3,7 +3,7 @@ package com.evn.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "students") // Название таблицы в БД
+@Table(name = "students")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,12 +1,14 @@
 package com.evn.websocket;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Component // WebSocketHandler теперь управляется Spring
 public class WebSocketHandler extends TextWebSocketHandler {
 
-    private static final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -15,11 +17,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        for (WebSocketSession s : sessions) {
-            if (s.isOpen()) {
-                s.sendMessage(new TextMessage("Новое обновление: " + message.getPayload()));
-            }
-        }
+        sendMessageToAll("Новое сообщение: " + message.getPayload());
     }
 
     @Override
@@ -27,10 +25,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
         sessions.remove(session);
     }
 
-    public static void sendMessageToAll(String message) throws Exception {
-        for (WebSocketSession session : sessions) {
-            if (session.isOpen()) {
-                session.sendMessage(new TextMessage(message));
+    // Метод для отправки сообщений всем клиентам
+    public void sendMessageToAll(String message) {
+        synchronized (sessions) {
+            for (WebSocketSession session : sessions) {
+                if (session.isOpen()) {
+                    try {
+                        session.sendMessage(new TextMessage(message));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }
